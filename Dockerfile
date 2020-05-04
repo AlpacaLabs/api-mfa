@@ -1,12 +1,29 @@
-FROM golang:1.10 as builder
-ADD . /go/src/github.com/hanakoa/alpaca
-WORKDIR /go/src/github.com/AlpacaLabs/mfa
-# won't need to go get vgo in golang 1.11
-RUN go get -u -v golang.org/x/vgo && \
-    CGO_ENABLED=0 GOOS=linux vgo build -a -o ./bin/alpaca-mfa .
+FROM golang:1.13 AS builder
 
-FROM alpine:latest
-RUN apk --no-cache add ca-certificates
-WORKDIR /root/
-COPY --from=builder /go/src/github.com/AlpacaLabs/mfa/bin/alpaca-mfa .
-CMD ["./alpaca-mfa"]
+ENV GO111MODULE on
+ENV GOPRIVATE github.com/AlpacaLabs
+
+ARG GITHUB_USER
+ARG GITHUB_PASS
+
+COPY go.mod go.sum /go/app/
+WORKDIR /go/app
+RUN go mod download
+
+COPY . /go/app
+RUN CGO_ENABLED=0 go build .
+
+WORKDIR /go/app
+
+FROM alpine:latest as app
+
+RUN GRPC_HEALTH_PROBE_VERSION=v0.3.0 \
+ && wget -qO/bin/grpc_health_probe https://github.com/grpc-ecosystem/grpc-health-probe/releases/download/${GRPC_HEALTH_PROBE_VERSION}/grpc_health_probe-linux-amd64 \
+ && chmod +x /bin/grpc_health_probe
+
+COPY --from=builder /go/app/app /app/app
+
+RUN apk add --no-cache ca-certificates
+
+WORKDIR /app
+CMD ["./app"]

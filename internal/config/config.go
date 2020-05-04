@@ -19,9 +19,9 @@ const (
 	flagForGrpcPort          = "grpc_port"
 	flagForGrpcPortHealth    = "grpc_port_health"
 	flagForHTTPPort          = "http_port"
-	flagForTwilioAccountSID  = "twilio_account_sid"
-	flagForTwilioAuthToken   = "twilio_auth_token"
-	flagForTwilioPhoneNumber = "twilio_phone_number"
+	flagForHermesGrpcAddress = "hermes_service_address"
+	flagForHermesGrpcHost    = "hermes_service_host"
+	flagForHermesGrpcPort    = "hermes_service_port_grpc"
 )
 
 type Config struct {
@@ -45,9 +45,8 @@ type Config struct {
 	// HealthPort controls what port our gRPC health endpoints run on.
 	HealthPort int
 
-	TwilioAccountSID  string
-	TwilioAuthToken   string
-	TwilioPhoneNumber string
+	// HermesGRPCAddress is the gRPC address of the Hermes service.
+	HermesGRPCAddress string
 }
 
 func (c Config) String() string {
@@ -76,9 +75,9 @@ func LoadConfig() Config {
 	flag.Int(flagForGrpcPortHealth, c.HealthPort, "gRPC health port")
 	flag.Int(flagForHTTPPort, c.HTTPPort, "gRPC HTTP port")
 
-	flag.String(flagForTwilioAccountSID, c.TwilioAccountSID, "Twilio Account SID")
-	flag.String(flagForTwilioAuthToken, c.TwilioAuthToken, "Twilio Auth Token")
-	flag.String(flagForTwilioPhoneNumber, c.TwilioPhoneNumber, "Twilio Phone Number")
+	flag.String(flagForHermesGrpcAddress, "", "Address of Hermes gRPC service")
+	flag.String(flagForHermesGrpcHost, "", "Host of Hermes gRPC service")
+	flag.String(flagForHermesGrpcPort, "", "Port of Hermes gRPC service")
 
 	flag.Parse()
 
@@ -91,9 +90,9 @@ func LoadConfig() Config {
 	viper.BindPFlag(flagForGrpcPortHealth, flag.Lookup(flagForGrpcPortHealth))
 	viper.BindPFlag(flagForHTTPPort, flag.Lookup(flagForHTTPPort))
 
-	viper.BindPFlag(flagForTwilioAccountSID, flag.Lookup(flagForTwilioAccountSID))
-	viper.BindPFlag(flagForTwilioAuthToken, flag.Lookup(flagForTwilioAuthToken))
-	viper.BindPFlag(flagForTwilioPhoneNumber, flag.Lookup(flagForTwilioPhoneNumber))
+	viper.BindPFlag(flagForHermesGrpcAddress, flag.Lookup(flagForHermesGrpcAddress))
+	viper.BindPFlag(flagForHermesGrpcHost, flag.Lookup(flagForHermesGrpcHost))
+	viper.BindPFlag(flagForHermesGrpcPort, flag.Lookup(flagForHermesGrpcPort))
 
 	viper.AutomaticEnv()
 
@@ -106,9 +105,7 @@ func LoadConfig() Config {
 	c.HealthPort = viper.GetInt(flagForGrpcPortHealth)
 	c.HTTPPort = viper.GetInt(flagForHTTPPort)
 
-	c.TwilioAccountSID = viper.GetString(flagForTwilioAccountSID)
-	c.TwilioAuthToken = viper.GetString(flagForTwilioAuthToken)
-	c.TwilioPhoneNumber = viper.GetString(flagForTwilioPhoneNumber)
+	c.HermesGRPCAddress = getGrpcAddress(flagForHermesGrpcAddress, flagForHermesGrpcHost, flagForHermesGrpcPort)
 
 	return c
 }

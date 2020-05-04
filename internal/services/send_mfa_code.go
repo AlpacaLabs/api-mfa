@@ -5,11 +5,13 @@ import (
 	"math/rand"
 	"time"
 
+	"google.golang.org/grpc"
+
 	clock "github.com/AlpacaLabs/go-timestamp"
 	"github.com/AlpacaLabs/mfa/internal/db"
 	authV1 "github.com/AlpacaLabs/protorepo-auth-go/alpacalabs/auth/v1"
+	hermesV1 "github.com/AlpacaLabs/protorepo-hermes-go/alpacalabs/hermes/v1"
 	"github.com/rs/xid"
-	"github.com/sfreiberg/gotwilio"
 	log "github.com/sirupsen/logrus"
 )
 
@@ -39,15 +41,20 @@ func (s *Service) SendMFACode(ctx context.Context, in *authV1.SendMFACodeRequest
 			return err
 		}
 
-		// TODO transactional outbox pattern
-		// TODO send phone number with request
-		twilioClient := gotwilio.NewTwilioClient(s.config.TwilioAccountSID, s.config.TwilioAuthToken)
-		if err := s.SendSms(ctx, SendSmsInput{
-			TwilioClient:      twilioClient,
-			TwilioPhoneNumber: s.config.TwilioPhoneNumber,
-			To:                "555-555-5555",
-			Message:           "hello from golang",
-		}); err != nil {
+		// TODO use transactional outbox pattern instead of sending SMS before the transaction commits
+		hermesConn, err := grpc.Dial(s.config.HermesGRPCAddress)
+		if err != nil {
+			return err
+		}
+		smsClient := hermesV1.NewSendSmsServiceClient(hermesConn)
+
+		// Send text
+		_, err = smsClient.SendSms(ctx, &hermesV1.SendSmsRequest{
+			To:      "555-555-5555",
+			Message: "hello from golang",
+		})
+
+		if err != nil {
 			return err
 		}
 

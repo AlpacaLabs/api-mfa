@@ -6,7 +6,7 @@ import (
 
 	"github.com/AlpacaLabs/mfa/internal/config"
 	"github.com/AlpacaLabs/mfa/internal/services"
-	authV1 "github.com/AlpacaLabs/protorepo-auth-go/alpacalabs/auth/v1"
+	mfaV1 "github.com/AlpacaLabs/protorepo-mfa-go/alpacalabs/mfa/v1"
 	log "github.com/sirupsen/logrus"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
@@ -38,7 +38,7 @@ func (s Server) Run() {
 	grpcServer := grpc.NewServer()
 
 	// Register our services
-	authV1.RegisterSendMFACodeServiceServer(grpcServer, s)
+	mfaV1.RegisterMFAServiceServer(grpcServer, s)
 
 	// Register reflection service on gRPC server.
 	reflection.Register(grpcServer)

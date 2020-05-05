@@ -4,19 +4,20 @@ import (
 	"context"
 	"database/sql"
 
-	authV1 "github.com/AlpacaLabs/protorepo-auth-go/alpacalabs/auth/v1"
+	mfaV1 "github.com/AlpacaLabs/protorepo-mfa-go/alpacalabs/mfa/v1"
+
 	"github.com/golang-sql/sqlexp"
 )
 
 type Transaction interface {
-	CreateCode(ctx context.Context, code authV1.MFACode) error
+	CreateCode(ctx context.Context, code mfaV1.MFACode) error
 }
 
 type txImpl struct {
 	tx *sql.Tx
 }
 
-func (tx *txImpl) CreateCode(ctx context.Context, c authV1.MFACode) error {
+func (tx *txImpl) CreateCode(ctx context.Context, c mfaV1.MFACode) error {
 	var q sqlexp.Querier
 	q = tx.tx
 

@@ -12,13 +12,18 @@ import (
 )
 
 const (
-	flagForDBUser            = "db_user"
-	flagForDBPass            = "db_pass"
-	flagForDBHost            = "db_host"
-	flagForDBName            = "db_name"
-	flagForGrpcPort          = "grpc_port"
-	flagForGrpcPortHealth    = "grpc_port_health"
-	flagForHTTPPort          = "http_port"
+	flagForDBUser         = "db_user"
+	flagForDBPass         = "db_pass"
+	flagForDBHost         = "db_host"
+	flagForDBName         = "db_name"
+	flagForGrpcPort       = "grpc_port"
+	flagForGrpcPortHealth = "grpc_port_health"
+	flagForHTTPPort       = "http_port"
+
+	flagForAccountGrpcAddress = "account_service_address"
+	flagForAccountGrpcHost    = "account_service_host"
+	flagForAccountGrpcPort    = "account_service_port_grpc"
+
 	flagForHermesGrpcAddress = "hermes_service_address"
 	flagForHermesGrpcHost    = "hermes_service_host"
 	flagForHermesGrpcPort    = "hermes_service_port_grpc"
@@ -44,6 +49,9 @@ type Config struct {
 
 	// HealthPort controls what port our gRPC health endpoints run on.
 	HealthPort int
+
+	// AccountGRPCAddress is the gRPC address of the Account service.
+	AccountGRPCAddress string
 
 	// HermesGRPCAddress is the gRPC address of the Hermes service.
 	HermesGRPCAddress string
@@ -75,6 +83,10 @@ func LoadConfig() Config {
 	flag.Int(flagForGrpcPortHealth, c.HealthPort, "gRPC health port")
 	flag.Int(flagForHTTPPort, c.HTTPPort, "gRPC HTTP port")
 
+	flag.String(flagForAccountGrpcAddress, "", "Address of Account gRPC service")
+	flag.String(flagForAccountGrpcHost, "", "Host of Account gRPC service")
+	flag.String(flagForAccountGrpcPort, "", "Port of Account gRPC service")
+
 	flag.String(flagForHermesGrpcAddress, "", "Address of Hermes gRPC service")
 	flag.String(flagForHermesGrpcHost, "", "Host of Hermes gRPC service")
 	flag.String(flagForHermesGrpcPort, "", "Port of Hermes gRPC service")
@@ -89,6 +101,10 @@ func LoadConfig() Config {
 	viper.BindPFlag(flagForGrpcPort, flag.Lookup(flagForGrpcPort))
 	viper.BindPFlag(flagForGrpcPortHealth, flag.Lookup(flagForGrpcPortHealth))
 	viper.BindPFlag(flagForHTTPPort, flag.Lookup(flagForHTTPPort))
+
+	viper.BindPFlag(flagForAccountGrpcAddress, flag.Lookup(flagForAccountGrpcAddress))
+	viper.BindPFlag(flagForAccountGrpcHost, flag.Lookup(flagForAccountGrpcHost))
+	viper.BindPFlag(flagForAccountGrpcPort, flag.Lookup(flagForAccountGrpcPort))
 
 	viper.BindPFlag(flagForHermesGrpcAddress, flag.Lookup(flagForHermesGrpcAddress))
 	viper.BindPFlag(flagForHermesGrpcHost, flag.Lookup(flagForHermesGrpcHost))
@@ -105,6 +121,7 @@ func LoadConfig() Config {
 	c.HealthPort = viper.GetInt(flagForGrpcPortHealth)
 	c.HTTPPort = viper.GetInt(flagForHTTPPort)
 
+	c.AccountGRPCAddress = getGrpcAddress(flagForAccountGrpcAddress, flagForAccountGrpcHost, flagForAccountGrpcPort)
 	c.HermesGRPCAddress = getGrpcAddress(flagForHermesGrpcAddress, flagForHermesGrpcHost, flagForHermesGrpcPort)
 
 	return c

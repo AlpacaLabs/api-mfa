@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"net"
 
-	"github.com/AlpacaLabs/mfa/internal/config"
+	"github.com/AlpacaLabs/mfa/internal/configuration"
 	"github.com/AlpacaLabs/mfa/internal/services"
 	mfaV1 "github.com/AlpacaLabs/protorepo-mfa-go/alpacalabs/mfa/v1"
 	log "github.com/sirupsen/logrus"
@@ -13,11 +13,11 @@ import (
 )
 
 type Server struct {
-	config  config.Config
+	config  configuration.Config
 	service services.Service
 }
 
-func NewServer(config config.Config, service services.Service) Server {
+func NewServer(config configuration.Config, service services.Service) Server {
 	return Server{
 		config:  config,
 		service: service,

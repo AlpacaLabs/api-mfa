@@ -5,17 +5,17 @@ import (
 
 	"github.com/AlpacaLabs/mfa/internal/grpc"
 
-	"github.com/AlpacaLabs/mfa/internal/config"
+	"github.com/AlpacaLabs/mfa/internal/configuration"
 	"github.com/AlpacaLabs/mfa/internal/db"
 	"github.com/AlpacaLabs/mfa/internal/http"
 	"github.com/AlpacaLabs/mfa/internal/services"
 )
 
 type App struct {
-	config config.Config
+	config configuration.Config
 }
 
-func NewApp(c config.Config) App {
+func NewApp(c configuration.Config) App {
 	return App{
 		config: c,
 	}

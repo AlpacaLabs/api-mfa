@@ -2,15 +2,12 @@ package services
 
 import (
 	"context"
-	"math/rand"
-	"time"
 
 	"google.golang.org/grpc"
 
 	"github.com/AlpacaLabs/mfa/internal/db"
 	hermesV1 "github.com/AlpacaLabs/protorepo-hermes-go/alpacalabs/hermes/v1"
 	mfaV1 "github.com/AlpacaLabs/protorepo-mfa-go/alpacalabs/mfa/v1"
-	log "github.com/sirupsen/logrus"
 )
 
 func (s *Service) SendCode(ctx context.Context, request *mfaV1.SendCodeRequest) (*mfaV1.SendCodeResponse, error) {
@@ -46,18 +43,4 @@ func (s *Service) SendCode(ctx context.Context, request *mfaV1.SendCodeRequest) 
 	}
 
 	return out, nil
-}
-
-var letters = []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789")
-
-func randSeq(n int) string {
-	b := make([]rune, n)
-	start := time.Now()
-	s1 := rand.NewSource(time.Now().UnixNano())
-	log.Println("Seed end time:", time.Since(start))
-	r1 := rand.New(s1)
-	for i := range b {
-		b[i] = letters[r1.Intn(len(letters))]
-	}
-	return string(b)
 }

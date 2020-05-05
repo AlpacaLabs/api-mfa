@@ -3,6 +3,7 @@ module github.com/AlpacaLabs/mfa
 go 1.14
 
 require (
+	github.com/AlpacaLabs/go-random-code v0.0.0-20200505155415-1225873a4f1d
 	github.com/AlpacaLabs/go-timestamp v0.0.0-20200502002453-181df3ead2e7
 	github.com/AlpacaLabs/protorepo-account-go v0.0.0-20200505153009-523688c153bb
 	github.com/AlpacaLabs/protorepo-hermes-go v0.0.0-20200504021841-28421f772c4d

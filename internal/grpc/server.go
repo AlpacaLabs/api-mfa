@@ -5,7 +5,7 @@ import (
 	"net"
 
 	"github.com/AlpacaLabs/mfa/internal/configuration"
-	"github.com/AlpacaLabs/mfa/internal/services"
+	"github.com/AlpacaLabs/mfa/internal/service"
 	mfaV1 "github.com/AlpacaLabs/protorepo-mfa-go/alpacalabs/mfa/v1"
 	log "github.com/sirupsen/logrus"
 	"google.golang.org/grpc"
@@ -14,10 +14,10 @@ import (
 
 type Server struct {
 	config  configuration.Config
-	service services.Service
+	service service.Service
 }
 
-func NewServer(config configuration.Config, service services.Service) Server {
+func NewServer(config configuration.Config, service service.Service) Server {
 	return Server{
 		config:  config,
 		service: service,

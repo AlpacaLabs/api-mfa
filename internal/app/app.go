@@ -8,7 +8,7 @@ import (
 	"github.com/AlpacaLabs/mfa/internal/configuration"
 	"github.com/AlpacaLabs/mfa/internal/db"
 	"github.com/AlpacaLabs/mfa/internal/http"
-	"github.com/AlpacaLabs/mfa/internal/services"
+	"github.com/AlpacaLabs/mfa/internal/service"
 )
 
 type App struct {
@@ -24,7 +24,7 @@ func NewApp(c configuration.Config) App {
 func (a App) Run() {
 	dbConn := db.Connect(a.config.DBUser, a.config.DBPass, a.config.DBHost, a.config.DBName)
 	dbClient := db.NewClient(dbConn)
-	svc := services.NewService(a.config, dbClient)
+	svc := service.NewService(a.config, dbClient)
 
 	var wg sync.WaitGroup
 

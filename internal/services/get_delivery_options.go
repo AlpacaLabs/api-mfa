@@ -57,7 +57,7 @@ func (s *Service) getCodeOptions(ctx context.Context, accountID string) (*mfaV1.
 	}
 	accountClient := accountV1.NewAccountServiceClient(accountConn)
 	res, err := accountClient.GetAccount(ctx, &accountV1.GetAccountRequest{
-		AccountIdentifier: &accountV1.GetAccountRequest_Id{Id: accountID},
+		AccountIdentifier: &accountV1.GetAccountRequest_AccountId{AccountId: accountID},
 	})
 	if err != nil {
 		return nil, err

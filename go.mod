@@ -5,13 +5,12 @@ go 1.14
 require (
 	github.com/AlpacaLabs/go-random-code v0.0.0-20200505155415-1225873a4f1d
 	github.com/AlpacaLabs/go-timestamp v0.0.0-20200502002453-181df3ead2e7
-	github.com/AlpacaLabs/protorepo-account-go v0.0.0-20200505173651-d5a53fd9ef4b
-	github.com/AlpacaLabs/protorepo-hermes-go v0.0.0-20200504021841-28421f772c4d
-	github.com/AlpacaLabs/protorepo-mfa-go v0.0.0-20200505173707-aafdcf96634b
+	github.com/AlpacaLabs/go-timestamp-sql v0.0.0-20200506000030-73a801105204
+	github.com/AlpacaLabs/protorepo-account-go v0.0.0-20200505194047-f20cfddb7495
+	github.com/AlpacaLabs/protorepo-mfa-go v0.0.0-20200506230307-1e9193b4c3be
 	github.com/AlpacaLabs/protorepo-pagination-go v0.0.0-20200503181518-cbf4b2f30657 // indirect
 	github.com/denisenkom/go-mssqldb v0.0.0-20200428022330-06a60b6afbbc // indirect
 	github.com/golang-sql/sqlexp v0.0.0-20170517235910-f1bb20e5a188
-	github.com/golang/protobuf v1.4.0
 	github.com/google/uuid v1.1.1
 	github.com/gorilla/mux v1.7.4
 	github.com/guregu/null v4.0.0+incompatible

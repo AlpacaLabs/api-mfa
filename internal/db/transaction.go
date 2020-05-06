@@ -16,6 +16,8 @@ type Transaction interface {
 	GetCode(ctx context.Context, id string) (*mfaV1.MFACode, error)
 	GetCodeByCodeAndAccountID(ctx context.Context, code, accountID string) (*mfaV1.MFACode, error)
 
+	CreateTxobForCode(ctx context.Context, in mfaV1.DeliverCodeRequest) error
+
 	MarkAsUsed(ctx context.Context, id string) error
 	MarkAllAsStale(ctx context.Context, accountID string) error
 }
@@ -87,6 +89,20 @@ AND stale=FALSE
 	}
 
 	return c.ToProtobuf(), nil
+}
+
+func (tx *txImpl) CreateTxobForCode(ctx context.Context, in mfaV1.DeliverCodeRequest) error {
+	var q sqlexp.Querier
+	q = tx.tx
+
+	query := `
+INSERT INTO mfa_code_txob(code_id, sent, email_address_id, phone_number_id) 
+ VALUES($1, FALSE, $2, $3)
+`
+
+	_, err := q.ExecContext(ctx, query, in.CodeId, in.GetEmailAddressId(), in.GetPhoneNumberId())
+
+	return err
 }
 
 func (tx *txImpl) MarkAsUsed(ctx context.Context, id string) error {

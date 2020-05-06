@@ -25,7 +25,7 @@ func NewServer(config configuration.Config, service service.Service) Server {
 func (s Server) Run() {
 	r := mux.NewRouter()
 
-	//r.HandleFunc("/mfa", s.SendCodeOptions).Methods(http.MethodPost)
+	//r.HandleFunc("/mfa", s.DeliverCodeOptions).Methods(http.MethodPost)
 
 	addr := fmt.Sprintf(":%d", s.config.HTTPPort)
 	log.Infof("Listening for HTTP on %s...\n", addr)

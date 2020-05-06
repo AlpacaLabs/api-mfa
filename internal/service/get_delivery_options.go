@@ -3,8 +3,6 @@ package service
 import (
 	"context"
 
-	"google.golang.org/grpc"
-
 	"github.com/AlpacaLabs/api-mfa/internal/db"
 	accountV1 "github.com/AlpacaLabs/protorepo-account-go/alpacalabs/account/v1"
 	mfaV1 "github.com/AlpacaLabs/protorepo-mfa-go/alpacalabs/mfa/v1"
@@ -47,15 +45,11 @@ func (s *Service) GetDeliveryOptions(ctx context.Context, request *mfaV1.GetDeli
 	}, nil
 }
 
-func (s *Service) getCodeOptions(ctx context.Context, accountID string) (*mfaV1.CodeOptions, error) {
+func (s *Service) getCodeOptions(ctx context.Context, accountID string) (*mfaV1.CodeDeliveryOptions, error) {
 	var emailAddresses []*accountV1.EmailAddress
 	var phoneNumbers []*accountV1.PhoneNumber
 
-	accountConn, err := grpc.Dial(s.config.AccountGRPCAddress)
-	if err != nil {
-		return nil, err
-	}
-	accountClient := accountV1.NewAccountServiceClient(accountConn)
+	accountClient := accountV1.NewAccountServiceClient(s.accountConn)
 	res, err := accountClient.GetAccount(ctx, &accountV1.GetAccountRequest{
 		AccountIdentifier: &accountV1.GetAccountRequest_AccountId{AccountId: accountID},
 	})
@@ -75,7 +69,7 @@ func (s *Service) getCodeOptions(ctx context.Context, accountID string) (*mfaV1.
 		}
 	}
 
-	codeOptions := &mfaV1.CodeOptions{
+	codeOptions := &mfaV1.CodeDeliveryOptions{
 		EmailAddresses: []*mfaV1.EmailAddressOption{},
 		PhoneNumbers:   []*mfaV1.PhoneNumberOption{},
 	}

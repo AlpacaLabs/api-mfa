@@ -9,6 +9,8 @@ import (
 	"github.com/AlpacaLabs/api-mfa/internal/db"
 	"github.com/AlpacaLabs/api-mfa/internal/http"
 	"github.com/AlpacaLabs/api-mfa/internal/service"
+	log "github.com/sirupsen/logrus"
+	grpcGo "google.golang.org/grpc"
 )
 
 type App struct {
@@ -24,7 +26,11 @@ func NewApp(c configuration.Config) App {
 func (a App) Run() {
 	dbConn := db.Connect(a.config.DBUser, a.config.DBPass, a.config.DBHost, a.config.DBName)
 	dbClient := db.NewClient(dbConn)
-	svc := service.NewService(a.config, dbClient)
+	accountConn, err := grpcGo.Dial(a.config.AccountGRPCAddress)
+	if err != nil {
+		log.Fatalf("failed to dial Account service: %v", err)
+	}
+	svc := service.NewService(a.config, dbClient, accountConn)
 
 	var wg sync.WaitGroup
 

@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"net"
 
-	"github.com/AlpacaLabs/mfa/internal/configuration"
-	"github.com/AlpacaLabs/mfa/internal/service"
+	"github.com/AlpacaLabs/api-mfa/internal/configuration"
+	"github.com/AlpacaLabs/api-mfa/internal/service"
 	mfaV1 "github.com/AlpacaLabs/protorepo-mfa-go/alpacalabs/mfa/v1"
 	log "github.com/sirupsen/logrus"
 	"google.golang.org/grpc"

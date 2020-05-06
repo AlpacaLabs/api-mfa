@@ -3,7 +3,7 @@ package service
 import (
 	"context"
 
-	"github.com/AlpacaLabs/mfa/internal/db"
+	"github.com/AlpacaLabs/api-mfa/internal/db"
 
 	mfaV1 "github.com/AlpacaLabs/protorepo-mfa-go/alpacalabs/mfa/v1"
 	"google.golang.org/grpc/codes"

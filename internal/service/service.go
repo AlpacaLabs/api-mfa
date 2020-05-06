@@ -1,8 +1,8 @@
 package service
 
 import (
-	"github.com/AlpacaLabs/mfa/internal/configuration"
-	"github.com/AlpacaLabs/mfa/internal/db"
+	"github.com/AlpacaLabs/api-mfa/internal/configuration"
+	"github.com/AlpacaLabs/api-mfa/internal/db"
 )
 
 type Service struct {

@@ -3,12 +3,12 @@ package app
 import (
 	"sync"
 
-	"github.com/AlpacaLabs/mfa/internal/grpc"
+	"github.com/AlpacaLabs/api-mfa/internal/grpc"
 
-	"github.com/AlpacaLabs/mfa/internal/configuration"
-	"github.com/AlpacaLabs/mfa/internal/db"
-	"github.com/AlpacaLabs/mfa/internal/http"
-	"github.com/AlpacaLabs/mfa/internal/service"
+	"github.com/AlpacaLabs/api-mfa/internal/configuration"
+	"github.com/AlpacaLabs/api-mfa/internal/db"
+	"github.com/AlpacaLabs/api-mfa/internal/http"
+	"github.com/AlpacaLabs/api-mfa/internal/service"
 )
 
 type App struct {

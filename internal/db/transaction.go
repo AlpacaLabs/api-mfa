@@ -4,7 +4,7 @@ import (
 	"context"
 	"database/sql"
 
-	"github.com/AlpacaLabs/mfa/internal/db/entities"
+	"github.com/AlpacaLabs/api-mfa/internal/db/entities"
 
 	mfaV1 "github.com/AlpacaLabs/protorepo-mfa-go/alpacalabs/mfa/v1"
 

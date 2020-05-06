@@ -5,7 +5,7 @@ import (
 
 	"google.golang.org/grpc"
 
-	"github.com/AlpacaLabs/mfa/internal/db"
+	"github.com/AlpacaLabs/api-mfa/internal/db"
 	accountV1 "github.com/AlpacaLabs/protorepo-account-go/alpacalabs/account/v1"
 	mfaV1 "github.com/AlpacaLabs/protorepo-mfa-go/alpacalabs/mfa/v1"
 )

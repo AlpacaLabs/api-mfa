@@ -1,4 +1,4 @@
-module github.com/AlpacaLabs/mfa
+module github.com/AlpacaLabs/api-mfa
 
 go 1.14
 

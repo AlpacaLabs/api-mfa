@@ -17,6 +17,7 @@ type Transaction interface {
 	GetCodeByCodeAndAccountID(ctx context.Context, code, accountID string) (*mfaV1.MFACode, error)
 
 	CreateTxobForCode(ctx context.Context, in mfaV1.DeliverCodeRequest) error
+	RequiresMfa(ctx context.Context, accountID string) (bool, error)
 
 	MarkAsUsed(ctx context.Context, id string) error
 	MarkAllAsStale(ctx context.Context, accountID string) error
@@ -103,6 +104,28 @@ INSERT INTO mfa_code_txob(code_id, sent, email_address_id, phone_number_id)
 	_, err := q.ExecContext(ctx, query, in.CodeId, in.GetEmailAddressId(), in.GetPhoneNumberId())
 
 	return err
+}
+
+func (tx *txImpl) RequiresMfa(ctx context.Context, accountID string) (bool, error) {
+	var q sqlexp.Querier
+	q = tx.tx
+
+	var requiresMFA bool
+
+	query := `
+SELECT requires_mfa 
+FROM account
+WHERE id=$1
+`
+
+	row := q.QueryRowContext(ctx, query, accountID)
+
+	err := row.Scan(&requiresMFA)
+	if err != nil {
+		return false, err
+	}
+
+	return requiresMFA, nil
 }
 
 func (tx *txImpl) MarkAsUsed(ctx context.Context, id string) error {

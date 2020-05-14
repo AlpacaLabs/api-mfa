@@ -4,6 +4,8 @@ import (
 	"encoding/json"
 	"fmt"
 
+	configuration "github.com/AlpacaLabs/go-config"
+
 	"github.com/google/uuid"
 	flag "github.com/spf13/pflag"
 
@@ -12,10 +14,6 @@ import (
 )
 
 const (
-	flagForDBUser         = "db_user"
-	flagForDBPass         = "db_pass"
-	flagForDBHost         = "db_host"
-	flagForDBName         = "db_name"
 	flagForGrpcPort       = "grpc_port"
 	flagForGrpcPortHealth = "grpc_port_health"
 	flagForHTTPPort       = "http_port"
@@ -36,16 +34,14 @@ type Config struct {
 	// AppID is a unique identifier for the instance (pod) running this app.
 	AppID string
 
-	DBHost string
-	DBUser string
-	DBPass string
-	DBName string
-
 	// GrpcPort controls what port our gRPC server runs on.
 	GrpcPort int
 
 	// HTTPPort controls what port our HTTP server runs on.
 	HTTPPort int
+
+	KafkaConfig configuration.KafkaConfig
+	SQLConfig   configuration.SQLConfig
 
 	// HealthPort controls what port our gRPC health endpoints run on.
 	HealthPort int
@@ -74,10 +70,8 @@ func LoadConfig() Config {
 		HTTPPort:   8083,
 	}
 
-	flag.String(flagForDBUser, c.DBUser, "DB user")
-	flag.String(flagForDBPass, c.DBPass, "DB pass")
-	flag.String(flagForDBHost, c.DBHost, "DB host")
-	flag.String(flagForDBName, c.DBName, "DB name")
+	c.KafkaConfig = configuration.LoadKafkaConfig()
+	c.SQLConfig = configuration.LoadSQLConfig()
 
 	flag.Int(flagForGrpcPort, c.GrpcPort, "gRPC port")
 	flag.Int(flagForGrpcPortHealth, c.HealthPort, "gRPC health port")
@@ -93,11 +87,6 @@ func LoadConfig() Config {
 
 	flag.Parse()
 
-	viper.BindPFlag(flagForDBUser, flag.Lookup(flagForDBUser))
-	viper.BindPFlag(flagForDBPass, flag.Lookup(flagForDBPass))
-	viper.BindPFlag(flagForDBHost, flag.Lookup(flagForDBHost))
-	viper.BindPFlag(flagForDBName, flag.Lookup(flagForDBName))
-
 	viper.BindPFlag(flagForGrpcPort, flag.Lookup(flagForGrpcPort))
 	viper.BindPFlag(flagForGrpcPortHealth, flag.Lookup(flagForGrpcPortHealth))
 	viper.BindPFlag(flagForHTTPPort, flag.Lookup(flagForHTTPPort))
@@ -111,11 +100,6 @@ func LoadConfig() Config {
 	viper.BindPFlag(flagForHermesGrpcPort, flag.Lookup(flagForHermesGrpcPort))
 
 	viper.AutomaticEnv()
-
-	c.DBUser = viper.GetString(flagForDBUser)
-	c.DBPass = viper.GetString(flagForDBPass)
-	c.DBHost = viper.GetString(flagForDBHost)
-	c.DBName = viper.GetString(flagForDBName)
 
 	c.GrpcPort = viper.GetInt(flagForGrpcPort)
 	c.HealthPort = viper.GetInt(flagForGrpcPortHealth)

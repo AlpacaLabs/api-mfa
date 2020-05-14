@@ -24,7 +24,10 @@ func NewApp(c configuration.Config) App {
 }
 
 func (a App) Run() {
-	dbConn := db.Connect(a.config.DBUser, a.config.DBPass, a.config.DBHost, a.config.DBName)
+	dbConn, err := db.Connect(a.config.SQLConfig)
+	if err != nil {
+		log.Fatalf("failed to dial account service: %v", err)
+	}
 	dbClient := db.NewClient(dbConn)
 	accountConn, err := grpcGo.Dial(a.config.AccountGRPCAddress)
 	if err != nil {

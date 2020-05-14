@@ -9,6 +9,7 @@ import (
 	mfaV1 "github.com/AlpacaLabs/protorepo-mfa-go/alpacalabs/mfa/v1"
 	log "github.com/sirupsen/logrus"
 	"google.golang.org/grpc"
+	health "google.golang.org/grpc/health/grpc_health_v1"
 	"google.golang.org/grpc/reflection"
 )
 
@@ -39,6 +40,7 @@ func (s Server) Run() {
 
 	// Register our services
 	mfaV1.RegisterMFAServiceServer(grpcServer, s)
+	health.RegisterHealthServer(grpcServer, s)
 
 	// Register reflection service on gRPC server.
 	reflection.Register(grpcServer)

@@ -14,6 +14,7 @@ require (
 	github.com/jackc/pgx/v4 v4.6.0
 	github.com/rs/xid v1.2.1
 	github.com/sirupsen/logrus v1.6.0
+	github.com/smartystreets/goconvey v1.6.4
 	github.com/spf13/pflag v1.0.5
 	github.com/spf13/viper v1.6.3
 	golang.org/x/net v0.0.0-20200501053045-e0ff5e5a1de5 // indirect

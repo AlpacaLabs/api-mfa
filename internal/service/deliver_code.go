@@ -26,18 +26,9 @@ func (s *Service) DeliverCode(ctx context.Context, request *mfaV1.DeliverCodeReq
 
 	var account *accountV1.Account
 	if pid := request.GetPhoneNumberId(); pid != "" {
-		// Look up phone number
-		phoneNumber, err := accountClient.GetPhoneNumberByID(ctx, &accountV1.GetPhoneNumberByIDRequest{
-			Id: pid,
-		})
-		if err != nil {
-			return nil, err
-		}
-
-		// Get the account's info
+		// Get the account's info by phone number ID
 		res, err := accountClient.GetAccount(ctx, &accountV1.GetAccountRequest{
-			// TODO support look up by phone number ID so we only have to make 1 grpc call
-			AccountIdentifier: &accountV1.GetAccountRequest_PhoneNumber{PhoneNumber: phoneNumber.PhoneNumber.PhoneNumber},
+			AccountIdentifier: &accountV1.GetAccountRequest_PhoneNumberId{PhoneNumberId: pid},
 		})
 		if err != nil {
 			return nil, err
@@ -46,18 +37,9 @@ func (s *Service) DeliverCode(ctx context.Context, request *mfaV1.DeliverCodeReq
 		// Set the account
 		account = res.Account
 	} else if eid := request.GetEmailAddressId(); eid != "" {
-		// Look up email address
-		emailAddress, err := accountClient.GetEmailAddressByID(ctx, &accountV1.GetEmailAddressByIDRequest{
-			Id: eid,
-		})
-		if err != nil {
-			return nil, err
-		}
-
-		// Get the account's info
+		// Get the account's info by email address ID
 		res, err := accountClient.GetAccount(ctx, &accountV1.GetAccountRequest{
-			// TODO support look up by email address ID so we only have to make 1 grpc call
-			AccountIdentifier: &accountV1.GetAccountRequest_EmailAddress{EmailAddress: emailAddress.EmailAddress.EmailAddress},
+			AccountIdentifier: &accountV1.GetAccountRequest_EmailAddressId{EmailAddressId: eid},
 		})
 		if err != nil {
 			return nil, err

@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/AlpacaLabs/api-mfa/internal/db"
+
 	accountV1 "github.com/AlpacaLabs/protorepo-account-go/alpacalabs/account/v1"
 	mfaV1 "github.com/AlpacaLabs/protorepo-mfa-go/alpacalabs/mfa/v1"
 )
@@ -19,8 +20,14 @@ func (s *Service) GetDeliveryOptions(ctx context.Context, request *mfaV1.GetDeli
 	// Create a new code
 	code := newCode(accountID)
 
-	// Run DB transaction
-	err := s.dbClient.RunInTransaction(ctx, func(ctx context.Context, tx db.Transaction) error {
+	// Call the Accounts service to get their email addresses and phone numbers
+	codeOptions, err := s.getCodeOptions(ctx, accountID)
+	if err != nil {
+		return nil, err
+	}
+
+	// Persist the code to the DB
+	if err := s.dbClient.RunInTransaction(ctx, func(ctx context.Context, tx db.Transaction) error {
 
 		// Persist the code to the DB
 		if err := tx.CreateCode(ctx, code); err != nil {
@@ -28,14 +35,7 @@ func (s *Service) GetDeliveryOptions(ctx context.Context, request *mfaV1.GetDeli
 		}
 
 		return nil
-	})
-
-	if err != nil {
-		return nil, err
-	}
-
-	codeOptions, err := s.getCodeOptions(ctx, accountID)
-	if err != nil {
+	}); err != nil {
 		return nil, err
 	}
 
@@ -73,6 +73,8 @@ func (s *Service) getCodeOptions(ctx context.Context, accountID string) (*mfaV1.
 		EmailAddresses: []*mfaV1.EmailAddressOption{},
 		PhoneNumbers:   []*mfaV1.PhoneNumberOption{},
 	}
+
+	// TODO consider masking phone numbers and emails
 
 	for _, e := range emailAddresses {
 		codeOptions.EmailAddresses = append(codeOptions.EmailAddresses, &mfaV1.EmailAddressOption{

@@ -3,6 +3,8 @@ package app
 import (
 	"sync"
 
+	"github.com/AlpacaLabs/go-kontext"
+
 	"github.com/AlpacaLabs/api-mfa/internal/grpc"
 
 	"github.com/AlpacaLabs/api-mfa/internal/configuration"
@@ -10,7 +12,6 @@ import (
 	"github.com/AlpacaLabs/api-mfa/internal/http"
 	"github.com/AlpacaLabs/api-mfa/internal/service"
 	log "github.com/sirupsen/logrus"
-	grpcGo "google.golang.org/grpc"
 )
 
 type App struct {
@@ -29,7 +30,7 @@ func (a App) Run() {
 		log.Fatalf("failed to dial account service: %v", err)
 	}
 	dbClient := db.NewClient(dbConn)
-	accountConn, err := grpcGo.Dial(a.config.AccountGRPCAddress)
+	accountConn, err := kontext.Dial(a.config.AccountGRPCAddress)
 	if err != nil {
 		log.Fatalf("failed to dial Account service: %v", err)
 	}

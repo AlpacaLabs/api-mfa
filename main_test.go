@@ -7,6 +7,8 @@ import (
 	"testing"
 	"time"
 
+	"github.com/AlpacaLabs/go-kontext"
+
 	"github.com/AlpacaLabs/api-mfa/internal/app"
 	"github.com/AlpacaLabs/api-mfa/internal/configuration"
 	mfaV1 "github.com/AlpacaLabs/protorepo-mfa-go/alpacalabs/mfa/v1"
@@ -46,7 +48,7 @@ func Test_MFA_Flow(t *testing.T) {
 
 func createGRPCConn(c configuration.Config) *grpc.ClientConn {
 	grpcAddress := fmt.Sprintf("localhost:%d", c.GrpcPort)
-	grpcConn, err := grpc.Dial(grpcAddress)
+	grpcConn, err := kontext.Dial(grpcAddress)
 	if err != nil {
 		logrus.Fatalf("failed to connect to our own gRPC server: %v", err)
 	}

@@ -4,6 +4,7 @@ go 1.14
 
 require (
 	github.com/AlpacaLabs/go-config v0.0.0-20200513234945-e6f2b4c2c8d6
+	github.com/AlpacaLabs/go-kontext v0.0.0-20200514174527-3ed650b2acce
 	github.com/AlpacaLabs/go-random-code v0.0.0-20200505155415-1225873a4f1d
 	github.com/AlpacaLabs/go-timestamp v0.0.0-20200502002453-181df3ead2e7
 	github.com/AlpacaLabs/protorepo-account-go v0.0.0-20200514013339-474a5f93d42b

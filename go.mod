@@ -10,7 +10,6 @@ require (
 	github.com/AlpacaLabs/protorepo-account-go v0.0.0-20200514013339-474a5f93d42b
 	github.com/AlpacaLabs/protorepo-mfa-go v0.0.0-20200506230307-1e9193b4c3be
 	github.com/AlpacaLabs/protorepo-pagination-go v0.0.0-20200503181518-cbf4b2f30657 // indirect
-	github.com/google/uuid v1.1.1
 	github.com/gorilla/mux v1.7.4
 	github.com/jackc/pgx/v4 v4.6.0
 	github.com/rs/xid v1.2.1

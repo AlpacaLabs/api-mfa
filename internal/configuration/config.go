@@ -4,9 +4,10 @@ import (
 	"encoding/json"
 	"fmt"
 
+	"github.com/rs/xid"
+
 	configuration "github.com/AlpacaLabs/go-config"
 
-	"github.com/google/uuid"
 	flag "github.com/spf13/pflag"
 
 	log "github.com/sirupsen/logrus"
@@ -14,9 +15,8 @@ import (
 )
 
 const (
-	flagForGrpcPort       = "grpc_port"
-	flagForGrpcPortHealth = "grpc_port_health"
-	flagForHTTPPort       = "http_port"
+	flagForGrpcPort = "grpc_port"
+	flagForHTTPPort = "http_port"
 
 	flagForAccountGrpcAddress = "account_service_address"
 	flagForAccountGrpcHost    = "account_service_host"
@@ -34,17 +34,17 @@ type Config struct {
 	// AppID is a unique identifier for the instance (pod) running this app.
 	AppID string
 
+	// KafkaConfig provides configuration for connecting to Apache Kafka.
+	KafkaConfig configuration.KafkaConfig
+
+	// SQLConfig provides configuration for connecting to a SQL database.
+	SQLConfig configuration.SQLConfig
+
 	// GrpcPort controls what port our gRPC server runs on.
 	GrpcPort int
 
 	// HTTPPort controls what port our HTTP server runs on.
 	HTTPPort int
-
-	KafkaConfig configuration.KafkaConfig
-	SQLConfig   configuration.SQLConfig
-
-	// HealthPort controls what port our gRPC health endpoints run on.
-	HealthPort int
 
 	// AccountGRPCAddress is the gRPC address of the Account service.
 	AccountGRPCAddress string
@@ -63,19 +63,17 @@ func (c Config) String() string {
 
 func LoadConfig() Config {
 	c := Config{
-		AppName:    "citadel",
-		AppID:      uuid.New().String(),
-		GrpcPort:   8081,
-		HealthPort: 8082,
-		HTTPPort:   8083,
+		AppName:  "api-mfa",
+		AppID:    xid.New().String(),
+		GrpcPort: 8081,
+		HTTPPort: 8083,
 	}
 
 	c.KafkaConfig = configuration.LoadKafkaConfig()
 	c.SQLConfig = configuration.LoadSQLConfig()
 
 	flag.Int(flagForGrpcPort, c.GrpcPort, "gRPC port")
-	flag.Int(flagForGrpcPortHealth, c.HealthPort, "gRPC health port")
-	flag.Int(flagForHTTPPort, c.HTTPPort, "gRPC HTTP port")
+	flag.Int(flagForHTTPPort, c.HTTPPort, "HTTP port")
 
 	flag.String(flagForAccountGrpcAddress, "", "Address of Account gRPC service")
 	flag.String(flagForAccountGrpcHost, "", "Host of Account gRPC service")
@@ -88,7 +86,6 @@ func LoadConfig() Config {
 	flag.Parse()
 
 	viper.BindPFlag(flagForGrpcPort, flag.Lookup(flagForGrpcPort))
-	viper.BindPFlag(flagForGrpcPortHealth, flag.Lookup(flagForGrpcPortHealth))
 	viper.BindPFlag(flagForHTTPPort, flag.Lookup(flagForHTTPPort))
 
 	viper.BindPFlag(flagForAccountGrpcAddress, flag.Lookup(flagForAccountGrpcAddress))
@@ -102,7 +99,6 @@ func LoadConfig() Config {
 	viper.AutomaticEnv()
 
 	c.GrpcPort = viper.GetInt(flagForGrpcPort)
-	c.HealthPort = viper.GetInt(flagForGrpcPortHealth)
 	c.HTTPPort = viper.GetInt(flagForHTTPPort)
 
 	c.AccountGRPCAddress = getGrpcAddress(flagForAccountGrpcAddress, flagForAccountGrpcHost, flagForAccountGrpcPort)

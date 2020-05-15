@@ -28,6 +28,6 @@ func (s Server) Run() {
 	//r.HandleFunc("/mfa", s.DeliverCodeOptions).Methods(http.MethodPost)
 
 	addr := fmt.Sprintf(":%d", s.config.HTTPPort)
-	log.Infof("Listening for HTTP on %s...\n", addr)
+	log.Infof("Listening for HTTP on %s...", addr)
 	log.Fatal(http.ListenAndServe(addr, r))
 }

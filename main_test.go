@@ -29,6 +29,11 @@ func TestMain(m *testing.M) {
 
 	go a.Run()
 
+	//envVars := os.Environ()
+	//for _, envVar := range envVars {
+	//	logrus.Infof("%s", envVar)
+	//}
+
 	conn = createGRPCConn(c)
 	waitUntilHealthy(conn)
 
@@ -47,7 +52,9 @@ func Test_MFA_Flow(t *testing.T) {
 }
 
 func createGRPCConn(c configuration.Config) *grpc.ClientConn {
-	grpcAddress := fmt.Sprintf("localhost:%d", c.GrpcPort)
+	host := os.Getenv("API_MFA_DB_SERVICE_HOST")
+	grpcAddress := fmt.Sprintf("%s:%d", host, c.GrpcPort)
+	logrus.Infof("Dialing gRPC server at %s", grpcAddress)
 	grpcConn, err := kontext.Dial(grpcAddress)
 	if err != nil {
 		logrus.Fatalf("failed to connect to our own gRPC server: %v", err)

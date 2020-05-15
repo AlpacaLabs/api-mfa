@@ -1,8 +1,6 @@
 package app
 
 import (
-	"sync"
-
 	"github.com/AlpacaLabs/go-kontext"
 
 	"github.com/AlpacaLabs/api-mfa/internal/grpc"
@@ -27,7 +25,7 @@ func NewApp(c configuration.Config) App {
 func (a App) Run() {
 	dbConn, err := db.Connect(a.config.SQLConfig)
 	if err != nil {
-		log.Fatalf("failed to dial account service: %v", err)
+		log.Fatalf("failed to connect to database: %v", err)
 	}
 	dbClient := db.NewClient(dbConn)
 	accountConn, err := kontext.Dial(a.config.AccountGRPCAddress)
@@ -36,15 +34,9 @@ func (a App) Run() {
 	}
 	svc := service.NewService(a.config, dbClient, accountConn)
 
-	var wg sync.WaitGroup
-
-	wg.Add(1)
 	httpServer := http.NewServer(a.config, svc)
-	httpServer.Run()
+	go httpServer.Run()
 
-	wg.Add(1)
 	grpcServer := grpc.NewServer(a.config, svc)
-	grpcServer.Run()
-
-	wg.Wait()
+	go grpcServer.Run()
 }

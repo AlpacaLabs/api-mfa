@@ -2,6 +2,7 @@ package app
 
 import (
 	"github.com/AlpacaLabs/go-kontext"
+	"sync"
 
 	"github.com/AlpacaLabs/api-mfa/internal/grpc"
 
@@ -34,9 +35,15 @@ func (a App) Run() {
 	}
 	svc := service.NewService(a.config, dbClient, accountConn)
 
+	var wg sync.WaitGroup
+
+	wg.Add(1)
 	httpServer := http.NewServer(a.config, svc)
 	go httpServer.Run()
 
+	wg.Add(1)
 	grpcServer := grpc.NewServer(a.config, svc)
 	go grpcServer.Run()
+
+	wg.Wait()
 }

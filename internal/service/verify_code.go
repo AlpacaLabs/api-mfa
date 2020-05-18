@@ -17,7 +17,7 @@ func (s *Service) VerifyCode(ctx context.Context, request *mfaV1.VerifyCodeReque
 
 	if err := s.dbClient.RunInTransaction(ctx, func(ctx context.Context, tx db.Transaction) error {
 		// Verify the code exists for the given account ID
-		c, err := tx.GetCodeByCodeAndAccountID(ctx, code, accountID)
+		c, err := tx.VerifyCode(ctx, code, accountID)
 		if err != nil {
 			return err
 		}

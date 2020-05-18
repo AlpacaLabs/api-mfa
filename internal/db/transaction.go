@@ -18,7 +18,7 @@ const (
 type Transaction interface {
 	CreateCode(ctx context.Context, code mfaV1.MFACode) error
 	GetCode(ctx context.Context, id string) (*mfaV1.MFACode, error)
-	GetCodeByCodeAndAccountID(ctx context.Context, code, accountID string) (*mfaV1.MFACode, error)
+	VerifyCode(ctx context.Context, code, accountID string) (*mfaV1.MFACode, error)
 
 	CreateTxobForCode(ctx context.Context, in mfaV1.DeliverCodeRequest) error
 	RequiresMfa(ctx context.Context, accountID string) (bool, error)
@@ -68,7 +68,7 @@ AND stale=FALSE
 	return c.ToProtobuf(), nil
 }
 
-func (tx *txImpl) GetCodeByCodeAndAccountID(ctx context.Context, code, accountID string) (*mfaV1.MFACode, error) {
+func (tx *txImpl) VerifyCode(ctx context.Context, code, accountID string) (*mfaV1.MFACode, error) {
 	var c entities.MFACode
 
 	queryTemplate := `

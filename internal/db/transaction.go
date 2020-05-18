@@ -31,6 +31,12 @@ type txImpl struct {
 	tx pgx.Tx
 }
 
+func newTransaction(tx pgx.Tx) Transaction {
+	return &txImpl{
+		tx: tx,
+	}
+}
+
 func (tx *txImpl) CreateCode(ctx context.Context, in mfaV1.MFACode) error {
 	c := entities.NewMFACodeFromProtobuf(in)
 

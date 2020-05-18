@@ -2,12 +2,17 @@ package db
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/jackc/pgx/v4"
 
 	"github.com/AlpacaLabs/api-mfa/internal/db/entities"
 
 	mfaV1 "github.com/AlpacaLabs/protorepo-mfa-go/alpacalabs/mfa/v1"
+)
+
+const (
+	TableForMFACodes = "authentication_code"
 )
 
 type Transaction interface {
@@ -29,13 +34,14 @@ type txImpl struct {
 func (tx *txImpl) CreateCode(ctx context.Context, in mfaV1.MFACode) error {
 	c := entities.NewMFACodeFromProtobuf(in)
 
-	query := `
-INSERT INTO authentication_code(
+	queryTemplate := `
+INSERT INTO %s(
   id, code, created_at, expires_at, stale, used, account_id
 ) 
 VALUES($1, $2, $3, $4, $5, $6, $7)
 `
 
+	query := fmt.Sprintf(queryTemplate, TableForMFACodes)
 	_, err := tx.tx.Exec(ctx, query, c.ID, c.Code, c.CreatedAt, c.ExpiresAt, c.Stale, c.Used, c.AccountID)
 
 	return err
@@ -44,13 +50,14 @@ VALUES($1, $2, $3, $4, $5, $6, $7)
 func (tx *txImpl) GetCode(ctx context.Context, id string) (*mfaV1.MFACode, error) {
 	var c entities.MFACode
 
-	query := `
+	queryTemplate := `
 SELECT id, code, created_at, expires_at, stale, used, account_id 
-FROM authentication_code
+FROM %s
 WHERE id=$1
 AND stale=FALSE
 `
 
+	query := fmt.Sprintf(queryTemplate, TableForMFACodes)
 	row := tx.tx.QueryRow(ctx, query, id)
 
 	err := row.Scan(&c.ID, &c.Code, &c.CreatedAt, &c.ExpiresAt, &c.Stale, &c.Used, &c.AccountID)
@@ -64,14 +71,15 @@ AND stale=FALSE
 func (tx *txImpl) GetCodeByCodeAndAccountID(ctx context.Context, code, accountID string) (*mfaV1.MFACode, error) {
 	var c entities.MFACode
 
-	query := `
+	queryTemplate := `
 SELECT id, code, created_at, expires_at, stale, used, account_id 
-FROM authentication_code
+FROM %s
 WHERE code=$1
 AND account_id=$2
 AND stale=FALSE
 `
 
+	query := fmt.Sprintf(queryTemplate, TableForMFACodes)
 	row := tx.tx.QueryRow(ctx, query, code, accountID)
 
 	err := row.Scan(&c.ID, &c.Code, &c.CreatedAt, &c.ExpiresAt, &c.Stale, &c.Used, &c.AccountID)
@@ -83,11 +91,12 @@ AND stale=FALSE
 }
 
 func (tx *txImpl) CreateTxobForCode(ctx context.Context, in mfaV1.DeliverCodeRequest) error {
-	query := `
+	queryTemplate := `
 INSERT INTO mfa_code_txob(code_id, sent, email_address_id, phone_number_id) 
  VALUES($1, FALSE, $2, $3)
 `
 
+	query := fmt.Sprintf(queryTemplate, TableForMFACodes)
 	_, err := tx.tx.Exec(ctx, query, in.CodeId, in.GetEmailAddressId(), in.GetPhoneNumberId())
 
 	return err
@@ -96,12 +105,13 @@ INSERT INTO mfa_code_txob(code_id, sent, email_address_id, phone_number_id)
 func (tx *txImpl) RequiresMfa(ctx context.Context, accountID string) (bool, error) {
 	var requiresMFA bool
 
-	query := `
+	queryTemplate := `
 SELECT requires_mfa 
 FROM account
 WHERE id=$1
 `
 
+	query := fmt.Sprintf(queryTemplate, TableForMFACodes)
 	row := tx.tx.QueryRow(ctx, query, accountID)
 
 	err := row.Scan(&requiresMFA)
@@ -113,20 +123,22 @@ WHERE id=$1
 }
 
 func (tx *txImpl) MarkAsUsed(ctx context.Context, id string) error {
-	query := `
-UPDATE authentication_code SET used = TRUE WHERE id=$1
+	queryTemplate := `
+UPDATE %s SET used = TRUE WHERE id=$1
 `
 
+	query := fmt.Sprintf(queryTemplate, TableForMFACodes)
 	_, err := tx.tx.Exec(ctx, query, id)
 
 	return err
 }
 
 func (tx *txImpl) MarkAllAsStale(ctx context.Context, accountID string) error {
-	query := `
-UPDATE authentication_code SET used = TRUE, stale = TRUE WHERE account_id=$1
+	queryTemplate := `
+UPDATE %s SET used = TRUE, stale = TRUE WHERE account_id=$1
 `
 
+	query := fmt.Sprintf(queryTemplate, TableForMFACodes)
 	_, err := tx.tx.Exec(ctx, query, accountID)
 
 	return err

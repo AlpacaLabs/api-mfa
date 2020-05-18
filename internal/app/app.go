@@ -1,8 +1,9 @@
 package app
 
 import (
-	"github.com/AlpacaLabs/go-kontext"
 	"sync"
+
+	"github.com/AlpacaLabs/go-kontext"
 
 	"github.com/AlpacaLabs/api-mfa/internal/grpc"
 

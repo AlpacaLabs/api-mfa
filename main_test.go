@@ -34,6 +34,9 @@ func TestMain(m *testing.M) {
 	//	logrus.Infof("%s", envVar)
 	//}
 
+	logrus.Infof("FOOOK")
+	listEnvVars()
+
 	conn = createGRPCConn(c)
 	waitUntilHealthy(conn)
 
@@ -49,6 +52,13 @@ func Test_MFA_Flow(t *testing.T) {
 		_, err := client.GetDeliveryOptions(ctx, &mfaV1.GetDeliveryOptionsRequest{AccountId: xid.New().String()})
 		So(err, ShouldBeNil)
 	})
+}
+
+func listEnvVars() {
+	envVars := os.Environ()
+	for _, e := range envVars {
+		logrus.Info(e)
+	}
 }
 
 func createGRPCConn(c configuration.Config) *grpc.ClientConn {

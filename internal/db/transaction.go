@@ -16,11 +16,12 @@ const (
 )
 
 type Transaction interface {
+	TransactionalOutbox
+
 	CreateCode(ctx context.Context, code mfaV1.MFACode) error
 	GetCode(ctx context.Context, id string) (*mfaV1.MFACode, error)
 	VerifyCode(ctx context.Context, code, accountID string) (*mfaV1.MFACode, error)
 
-	CreateTxobForCode(ctx context.Context, in mfaV1.DeliverCodeRequest) error
 	RequiresMfa(ctx context.Context, accountID string) (bool, error)
 
 	MarkAsUsed(ctx context.Context, id string) error
@@ -29,11 +30,15 @@ type Transaction interface {
 
 type txImpl struct {
 	tx pgx.Tx
+	outboxImpl
 }
 
 func newTransaction(tx pgx.Tx) Transaction {
 	return &txImpl{
 		tx: tx,
+		outboxImpl: outboxImpl{
+			tx: tx,
+		},
 	}
 }
 
@@ -94,18 +99,6 @@ AND stale=FALSE
 	}
 
 	return c.ToProtobuf(), nil
-}
-
-func (tx *txImpl) CreateTxobForCode(ctx context.Context, in mfaV1.DeliverCodeRequest) error {
-	queryTemplate := `
-INSERT INTO mfa_code_txob(code_id, sent, email_address_id, phone_number_id) 
- VALUES($1, FALSE, $2, $3)
-`
-
-	query := fmt.Sprintf(queryTemplate, TableForMFACodes)
-	_, err := tx.tx.Exec(ctx, query, in.CodeId, in.GetEmailAddressId(), in.GetPhoneNumberId())
-
-	return err
 }
 
 func (tx *txImpl) RequiresMfa(ctx context.Context, accountID string) (bool, error) {

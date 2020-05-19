@@ -3,6 +3,8 @@ package app
 import (
 	"sync"
 
+	"github.com/AlpacaLabs/api-mfa/internal/async"
+
 	"github.com/AlpacaLabs/go-kontext"
 
 	"github.com/AlpacaLabs/api-mfa/internal/grpc"
@@ -25,26 +27,30 @@ func NewApp(c configuration.Config) App {
 }
 
 func (a App) Run() {
-	dbConn, err := db.Connect(a.config.SQLConfig)
+	config := a.config
+	dbConn, err := db.Connect(config.SQLConfig)
 	if err != nil {
 		log.Fatalf("failed to connect to database: %v", err)
 	}
 	dbClient := db.NewClient(dbConn)
-	accountConn, err := kontext.Dial(a.config.AccountGRPCAddress)
+	accountConn, err := kontext.Dial(config.AccountGRPCAddress)
 	if err != nil {
 		log.Fatalf("failed to dial Account service: %v", err)
 	}
-	svc := service.NewService(a.config, dbClient, accountConn)
+	svc := service.NewService(config, dbClient, accountConn)
 
 	var wg sync.WaitGroup
 
 	wg.Add(1)
-	httpServer := http.NewServer(a.config, svc)
+	httpServer := http.NewServer(config, svc)
 	go httpServer.Run()
 
 	wg.Add(1)
-	grpcServer := grpc.NewServer(a.config, svc)
+	grpcServer := grpc.NewServer(config, svc)
 	go grpcServer.Run()
+
+	wg.Add(1)
+	go async.RelayMessagesForSend(config, dbClient)
 
 	wg.Wait()
 }

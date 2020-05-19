@@ -13,7 +13,7 @@ import (
 // It will persist a new MFA code to the database and return to the client
 // a set of possible authentication options, including any confirmed email addresses
 // and phone numbers belonging to the account.
-func (s *Service) GetDeliveryOptions(ctx context.Context, request *mfaV1.GetDeliveryOptionsRequest) (*mfaV1.GetDeliveryOptionsResponse, error) {
+func (s Service) GetDeliveryOptions(ctx context.Context, request *mfaV1.GetDeliveryOptionsRequest) (*mfaV1.GetDeliveryOptionsResponse, error) {
 	// The account that is trying to authenticate w/ MFA
 	accountID := request.AccountId
 
@@ -45,7 +45,7 @@ func (s *Service) GetDeliveryOptions(ctx context.Context, request *mfaV1.GetDeli
 	}, nil
 }
 
-func (s *Service) getCodeOptions(ctx context.Context, accountID string) (*mfaV1.CodeDeliveryOptions, error) {
+func (s Service) getCodeOptions(ctx context.Context, accountID string) (*mfaV1.CodeDeliveryOptions, error) {
 	var emailAddresses []*accountV1.EmailAddress
 	var phoneNumbers []*accountV1.PhoneNumber
 

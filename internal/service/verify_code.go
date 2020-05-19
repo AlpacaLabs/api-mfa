@@ -11,7 +11,7 @@ import (
 )
 
 // VerifyCode lets clients complete the MFA flow by sending the code and account ID.
-func (s *Service) VerifyCode(ctx context.Context, request *mfaV1.VerifyCodeRequest) (*mfaV1.VerifyCodeResponse, error) {
+func (s Service) VerifyCode(ctx context.Context, request *mfaV1.VerifyCodeRequest) (*mfaV1.VerifyCodeResponse, error) {
 	accountID := request.AccountId
 	code := request.Code
 

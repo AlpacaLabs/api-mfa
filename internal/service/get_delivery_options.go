@@ -26,7 +26,6 @@ func (s Service) GetDeliveryOptions(ctx context.Context, request *mfaV1.GetDeliv
 		return nil, err
 	}
 
-	// Persist the code to the DB
 	if err := s.dbClient.RunInTransaction(ctx, func(ctx context.Context, tx db.Transaction) error {
 
 		// Persist the code to the DB

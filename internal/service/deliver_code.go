@@ -3,9 +3,9 @@ package service
 import (
 	"context"
 	"errors"
+	"fmt"
 
 	"github.com/AlpacaLabs/api-mfa/internal/db/entities"
-	"github.com/AlpacaLabs/go-kontext"
 	hermesV1 "github.com/AlpacaLabs/protorepo-hermes-go/alpacalabs/hermes/v1"
 	"github.com/golang/protobuf/proto"
 
@@ -23,6 +23,7 @@ var (
 
 // DeliverCode lets the client choose which email address or phone number to deliver the code to.
 func (s Service) DeliverCode(ctx context.Context, request *mfaV1.DeliverCodeRequest) (*mfaV1.DeliverCodeResponse, error) {
+	funcName := "DeliverCode"
 
 	// primary key for the code entity
 	codeID := request.CodeId
@@ -74,18 +75,26 @@ func (s Service) DeliverCode(ctx context.Context, request *mfaV1.DeliverCodeRequ
 
 		// TODO verify requester ID == mfaCode.AccountId
 
-		traceInfo := kontext.GetTraceInfo(ctx)
-
 		var payload proto.Message
+
+		var transactionalOutboxTable string
 
 		if emailAddressID != "" {
 			payload = s.buildSendEmailRequest()
+			transactionalOutboxTable = db.TableForSendEmailRequest
 		} else if phoneNumberID != "" {
 			payload = s.buildSendSmsRequest()
+			transactionalOutboxTable = db.TableForSendSmsRequest
 		}
 
-		event := entities.NewSendEvent(traceInfo, *request, payload)
-		return tx.CreateEvent(ctx, event)
+		// Create the event entity that will be persisted to the transactional outbox
+		event, err := entities.NewEvent(ctx, request, payload)
+		if err != nil {
+			return fmt.Errorf("failed to create event in %s: %w", funcName, err)
+		}
+
+		// Persist the event to the transactional outbox
+		return tx.CreateEvent(ctx, event, transactionalOutboxTable)
 	})
 
 	if err != nil {

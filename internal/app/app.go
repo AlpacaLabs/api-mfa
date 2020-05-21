@@ -50,7 +50,10 @@ func (a App) Run() {
 	go grpcServer.Run()
 
 	wg.Add(1)
-	go async.RelayMessagesForSend(config, dbClient)
+	go async.RelayMessagesForSendEmail(config, dbClient)
+
+	wg.Add(1)
+	go async.RelayMessagesForSendSms(config, dbClient)
 
 	wg.Wait()
 }
